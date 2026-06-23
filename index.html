@@ -489,7 +489,23 @@
 
       <form id="quoteForm" novalidate>
         <h3>Request a quote</h3>
-        <p class="sub">Fill this out and your email app will open with the details ready to send.</p>
+        <p class="sub">Send us the details and we'll get back to you to set up a time. The more you tell us, the better — we'll confirm the rest in person.</p>
+
+        <!-- ============================================================
+             EMAIL SETUP — one step to make this form send to your inbox:
+             1. Go to  https://web3forms.com
+             2. Enter your destination email and click "Create Access Key"
+             3. Copy the key they email you and paste it below, replacing
+                PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE
+             Your email address is NOT shown anywhere on the page — only this key,
+             which can only deliver messages TO your registered inbox.
+        ============================================================ -->
+        <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE" />
+        <input type="hidden" name="subject" value="New quote request — Build Craft Clean website" />
+        <input type="hidden" name="from_name" value="Build Craft Clean website" />
+        <!-- spam honeypot: real visitors never fill this -->
+        <input type="checkbox" name="botcheck" style="display:none !important" tabindex="-1" autocomplete="off" />
+
         <div class="row2">
           <div class="field">
             <label for="name">Name</label>
@@ -516,6 +532,7 @@
           <textarea id="message" name="message" placeholder="Tell us a bit about the project, the address or area, and your timeline."></textarea>
         </div>
         <button type="submit" class="btn btn-amber">Send my request</button>
+        <p id="formStatus" role="status" aria-live="polite" style="display:none;margin-top:.9rem;font-family:var(--semi);font-weight:600;font-size:.92rem"></p>
         <p class="form-note">Prefer to talk? Call or text <a href="tel:+14695550000" style="color:var(--amber-deep);font-weight:600">(469) 555-0000</a>.</p>
       </form>
     </div>
@@ -585,26 +602,55 @@
   },{threshold:.12});
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 
-  // form -> mailto (works without a server)
-  document.getElementById('quoteForm').addEventListener('submit', function(ev){
+  // form -> Web3Forms (sends the quote request straight to the owner's inbox)
+  var quoteForm = document.getElementById('quoteForm');
+  var formStatus = document.getElementById('formStatus');
+
+  function showStatus(msg, ok){
+    formStatus.textContent = msg;
+    formStatus.style.color = ok ? 'var(--amber-deep)' : '#B22A1A';
+    formStatus.style.display = 'block';
+  }
+
+  quoteForm.addEventListener('submit', function(ev){
     ev.preventDefault();
+
     var name = document.getElementById('name').value.trim();
     var phone = document.getElementById('phone').value.trim();
-    var service = document.getElementById('service').value;
-    var message = document.getElementById('message').value.trim();
     if(!name || !phone){
-      alert('Please add your name and phone so we can get back to you.');
+      showStatus('Please add your name and phone so we can get back to you.', false);
       return;
     }
-    var subject = 'Quote request — ' + service + ' (' + name + ')';
-    var body =
-      'Name: ' + name + '\n' +
-      'Phone: ' + phone + '\n' +
-      'Service: ' + service + '\n\n' +
-      'Details:\n' + (message || '(none provided)');
-    window.location.href = 'mailto:hello@buildcraftclean.com'
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(body);
+
+    var submitBtn = quoteForm.querySelector('button[type="submit"]');
+    var original = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    showStatus('Sending your request…', true);
+
+    var payload = JSON.stringify(Object.fromEntries(new FormData(quoteForm)));
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: payload
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if(data.success){
+        quoteForm.reset();
+        showStatus('Thanks, ' + name + '! Your request was sent — we\'ll be in touch shortly.', true);
+      } else {
+        showStatus('Something went wrong. Please call or text us at (469) 555-0000.', false);
+      }
+    })
+    .catch(function(){
+      showStatus('Network error. Please call or text us at (469) 555-0000.', false);
+    })
+    .finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = original;
+    });
   });
 </script>
 </body>
