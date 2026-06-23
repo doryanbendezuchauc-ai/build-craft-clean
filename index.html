@@ -438,7 +438,7 @@
     <div class="about-copy reveal">
       <span class="eyebrow">Who we are</span>
       <h2 style="font-size:clamp(2.1rem,6vw,3.4rem);margin:.5rem 0 1.2rem;">Built on craftsmanship, finished with care</h2>
-      <p>Build Craft Clean LLC is a Dallas-based general contractor owned and run by <strong>Lenin John Bendezu Jurado</strong>. We started with a simple idea: a client shouldn't have to hire a builder, a cabinet maker, and a cleaning crew to get one project done.</p>
+      <p>Build Craft Clean LLC is a Dallas-based general contractor owned by <strong>Lenin John</strong> and run day-to-day by <strong>[Operator Name]</strong>. We started with a simple idea: a client shouldn't have to hire a builder, a cabinet maker, and a cleaning crew to get one project done.</p>
       <p>So we do all three. Our team handles the <strong>build</strong>, our carpenter handles the <strong>craft</strong>, and we finish every job with a thorough <strong>clean</strong> — including the debris haul-off most contractors leave behind.</p>
       <p>We treat every home and business like it's our own, we show up when we say we will, and we're proud to serve our Dallas neighbors in both English and Spanish.</p>
       <div class="stats">
@@ -450,9 +450,13 @@
 
     <aside class="owner-card reveal">
       <div class="ticks" aria-hidden="true"></div>
-      <span class="role">Owner &amp; Operator</span>
-      <div class="who">Lenin John<br>Bendezu Jurado</div>
+      <span class="role">Owner</span>
+      <div class="who">Lenin John</div>
       <p>"We don't consider a job finished until it's built right, the details are clean, and the site is spotless. That's the whole reason for our name."</p>
+      <div style="margin-top:1.5rem;padding-top:1.3rem;border-top:1px solid var(--line)">
+        <span class="role">Operator</span>
+        <div class="who" style="font-size:1.5rem;margin:.45rem 0 0">[Operator Name]</div>
+      </div>
       <div class="sig">— Build Craft Clean</div>
     </aside>
   </div>
@@ -492,19 +496,21 @@
         <p class="sub">Send us the details and we'll get back to you to set up a time. The more you tell us, the better — we'll confirm the rest in person.</p>
 
         <!-- ============================================================
-             EMAIL SETUP — one step to make this form send to your inbox:
-             1. Go to  https://web3forms.com
-             2. Enter your destination email and click "Create Access Key"
-             3. Copy the key they email you and paste it below, replacing
-                PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE
-             Your email address is NOT shown anywhere on the page — only this key,
-             which can only deliver messages TO your registered inbox.
+             EMAIL SETUP — FormSubmit.co (free, NO account or signup):
+             1. In the <script> at the bottom of this file, find FORM_ENDPOINT
+                and replace PASTE_YOUR_EMAIL_OR_ALIAS with your destination email.
+             2. Publish the site, then submit this form once. FormSubmit emails
+                that inbox a single activation link — click it. That's the only
+                verification, and it goes straight to your own inbox.
+             3. (Keeps your email private) That same activation email gives you a
+                random ALIAS like  formsubmit.co/el/abc123 . Put the alias into
+                FORM_ENDPOINT instead of your email so it never shows in the page.
         ============================================================ -->
-        <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE" />
-        <input type="hidden" name="subject" value="New quote request — Build Craft Clean website" />
-        <input type="hidden" name="from_name" value="Build Craft Clean website" />
+        <input type="hidden" name="_subject" value="New quote request — Build Craft Clean website" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
         <!-- spam honeypot: real visitors never fill this -->
-        <input type="checkbox" name="botcheck" style="display:none !important" tabindex="-1" autocomplete="off" />
+        <input type="text" name="_honey" style="display:none !important" tabindex="-1" autocomplete="off" />
 
         <div class="row2">
           <div class="field">
@@ -628,16 +634,20 @@
     submitBtn.textContent = 'Sending…';
     showStatus('Sending your request…', true);
 
+    // FormSubmit.co endpoint — replace PASTE_YOUR_EMAIL_OR_ALIAS with your
+    // destination email (or, after activation, your private alias).
+    var FORM_ENDPOINT = 'https://formsubmit.co/ajax/PASTE_YOUR_EMAIL_OR_ALIAS';
+
     var payload = JSON.stringify(Object.fromEntries(new FormData(quoteForm)));
 
-    fetch('https://api.web3forms.com/submit', {
+    fetch(FORM_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: payload
     })
     .then(function(res){ return res.json(); })
     .then(function(data){
-      if(data.success){
+      if(data.success === true || data.success === 'true'){
         quoteForm.reset();
         showStatus('Thanks, ' + name + '! Your request was sent — we\'ll be in touch shortly.', true);
       } else {
