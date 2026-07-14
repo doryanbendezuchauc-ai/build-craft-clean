@@ -115,7 +115,7 @@
   .hero-eyebrow .dot{width:5px;height:5px;background:var(--amber);border-radius:50%;display:inline-block}
   .verbs{margin:.2rem 0 1.4rem}
   .verb-row{
-    display:flex;align-items:baseline;flex-wrap:wrap;gap:.4rem 1.4rem;
+    display:flex;align-items:center;flex-wrap:wrap;gap:.4rem 1.4rem;
     padding:.35rem 0;border-bottom:1px solid var(--line-light);
   }
   .verb-row:first-child{border-top:1px solid var(--line-light)}
@@ -128,7 +128,7 @@
   .verb-desc{
     font-family:var(--semi);font-weight:500;text-transform:uppercase;
     letter-spacing:.04em;font-size:clamp(.86rem,1.6vw,1.08rem);
-    color:var(--concrete-light);max-width:24ch;
+    color:var(--concrete-light);flex:0 1 24ch;margin-left:auto;
   }
   .hero-foot{display:flex;flex-wrap:wrap;gap:1.8rem;align-items:center;justify-content:space-between;margin-top:2.2rem}
   .hero-lede{max-width:46ch;color:#D9D3C7;font-size:1.06rem}
@@ -250,7 +250,7 @@
     }
     .mobile-open .nav-links a{font-size:1rem}
     .verb-row{gap:.1rem .9rem}
-    .verb-desc{max-width:none}
+    .verb-desc{flex:1 1 100%;margin-left:0}
     .hero-foot{flex-direction:column;align-items:flex-start;gap:1.4rem}
     .hero-actions .btn{flex:1}
   }
